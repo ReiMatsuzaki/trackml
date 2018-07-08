@@ -1,0 +1,7 @@
+out/
+try_*
+.ipynb_checkpoints/
+__pycache__/
+*.log
+
+
