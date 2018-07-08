@@ -17,8 +17,7 @@ sys.path.append("..")
 import models
 from utils import create_one_event_submission
 
-def run(filename):
-    
+def run(filename):    
     model = models.UnrollingHelicesBayessianOpt()
     path_to_input = os.path.join(path_to_trackml, "train_1")
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],

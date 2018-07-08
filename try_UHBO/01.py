@@ -46,8 +46,27 @@ def run(f):
                      n_iter = 20,
                      acq = "ucb",
                      kappa = 2.576)
-        f.write(str(opt.res["max"]))
+
+                # [string]
+        labels = opt.res["max"]["max_params"].keys()
+        # [dict(string, [float])]
+        params = opt.res["all"]["params"]
+        len_params = len(params)
+    
+        data_dic = {}
+
+        for label in labels:
+            val = [opt.res["max"]["max_params"][label]]
+            for i in range(len_params):
+                val.append(params[i][label])
+                data_dic[label] = val
+        data_dic["value"] = [opt.res["max"]["max_val"]] + opt.res["all"]["values"]
+        data_dic["index"] = ["max"] + [str(x) for x in range(len_params)]
+        df = pd.DataFrame(data_dic)
+        df.to_csv(filename, index=None)
 
 if __name__=="__main__":
-    with open(sys.argv[0].split(".")[0]+".log", "w") as f:
-        run(f)
+    run(sys.argv[0].split(".")[0]+".log")
+
+
+    
