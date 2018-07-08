@@ -35,10 +35,10 @@ def run(filename):
                                    {"w1": (0.9, 1.2),
                                     "w2": (0.3, 0.7),
                                     "w3": (0.1, 0.4),
-                                    "niter": (4, 6)},  #(140, 190)
+                                    "niter": (140, 190)},  #(140, 190)
                                    verbose = True)
         opt.maximize(init_points = 3,
-                     n_iter = 2, #
+                     n_iter = 20, #
                      acq = "ucb",
                      kappa = 2.576)
 
