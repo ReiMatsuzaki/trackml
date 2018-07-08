@@ -1,5 +1,6 @@
 out/
-try_*
+try_UHWS/
+try_UHf/
 .ipynb_checkpoints/
 __pycache__/
 *.log
