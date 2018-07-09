@@ -29,6 +29,7 @@ def run(filename):
             model.dbscan_weight[2] = w2
             model.dbscan_weight[3] = w3
             model.dbscan_weight[4] = w4
+            model.iter_size_helix = int(niter)
             labels = model.predict(hits)
             one_submission = create_one_event_submission(event_id, hits, labels)
             score = score_event(truth, one_submission)

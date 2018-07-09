@@ -18,17 +18,23 @@ import models
 from utils import create_one_event_submission
 
 def run(filename):
-    model = models.UnrollingHelices(use_outlier=False)
+    model = models.UnrollingHelices(use_outlier=False,
+                                    dbscan_features = ["sina1", "cosa1", "z1", "x1", "x2", "x_y", "x_rt", "y_rt"],
+                                    dbscan_weight   = [1.0,     1.0,     0.75, 0.5,  0.5,  0.2,   0.2,    0.2])
     path_to_input = os.path.join(path_to_trackml, "train_1")
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],
                                               skip=0, nevents=1):
 
-        def Fun4BO(w1, w2, w3, w4,  niter):
+        def Fun4BO(w1, w2, w3, w4, w5, w6, niter):
             model.dbscan_weight[0] = w1
             model.dbscan_weight[1] = w1
             model.dbscan_weight[2] = w2
             model.dbscan_weight[3] = w3
             model.dbscan_weight[4] = w4
+            model.dbscan_weight[5] = w5
+            model.dbscan_weight[6] = w6
+            model.dbscan_weight[7] = w6
+            model.iter_size_helix = int(niter)
             labels = model.predict(hits)
             one_submission = create_one_event_submission(event_id, hits, labels)
             score = score_event(truth, one_submission)
@@ -40,6 +46,8 @@ def run(filename):
                                     "w2": (0.3, 0.8),
                                     "w3": (0.1, 0.6),
                                     "w4": (0.1, 0.6),
+                                    "w5": (0.1, 0.6),
+                                    "w6": (0.1, 0.6),
                                     "niter": (140, 190)},  #(140, 190)
                                    verbose = True)
         opt.maximize(init_points = 3,
