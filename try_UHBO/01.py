@@ -17,7 +17,7 @@ sys.path.append("..")
 import models
 from utils import create_one_event_submission
 
-def run(f):
+def run(filename):
     model = models.UnrollingHelices(use_outlier=False)
     path_to_input = os.path.join(path_to_trackml, "train_1")
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],
