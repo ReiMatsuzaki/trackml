@@ -18,16 +18,20 @@ import models
 from utils import create_one_event_submission
 
 def run(filename):
-    model = models.UnrollingHelicesRt2()    
+    model = models.UnrollingHelicesRt2(
+        dbscan_features=["sina1", "cosa1", "z1", "z2"],
+        dbscan_weight  =[1.0,     1.0,     0.75, 0.2])
     path_to_input = os.path.join(path_to_trackml, "train_1")
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],
                                               skip=0, nevents=1):
 
-        def Fun4BO(w1, w2, w3, niter):
+        def Fun4BO(w1, w2, w3, c1, c2, niter):
             model.dbscan_weight[0] = w1
             model.dbscan_weight[1] = w1
             model.dbscan_weight[2] = w2
             model.dbscan_weight[3] = w3
+            model.coef_rt1 = c1
+            model.coef_rt2 = c2
             model.niter = int(niter)
             labels = model.predict(hits)
             one_submission = create_one_event_submission(event_id, hits, labels)
@@ -39,6 +43,8 @@ def run(filename):
                                    {"w1": (0.9, 1.2),
                                     "w2": (0.3, 0.7),
                                     "w3": (0.1, 0.4),
+                                    "c1": (0.5, 1.5),
+                                    "c2": (0.1, 5.0),
                                     "niter": (140, 190)},  #(140, 190)
                                    verbose = True)
         opt.maximize(init_points = 3,

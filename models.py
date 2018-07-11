@@ -198,33 +198,54 @@ class UnrollingHelicesWithScore(object):
         return dfh["track"]
                 
             
-class UnrollingHelicesBayessianOpt(object):
-    def __init__(self,rz_scales=[0.65, 0.965, 1.528]):
-        self.rz_scales=rz_scales
+class UnrollingHelicesRt2(object):
+    """
+    DBSCAN with Unrolling helices based on https://www.kaggle.com/sionek/bayesian-optimization.
+    """
+    def __init__(self,
+                 dbscan_features= ["sina1", "cosa1", "z1", "z2"],
+                 dbscan_weight  = [1.0,     1.0,     0.75, 0.2],
+                 niter = 100,
+                 coef_rt1 = 1.0,
+                 coef_rt2 = 1.0,
+                 coef_a1 = 1000.0):
+
+        if(len(dbscan_features) != len(dbscan_weight)):
+            raise InputError("len(dbscan_features) != len(dbscan_weight)")
+
+        self.dbscan_features = dbscan_features
+        self.dbscan_weight = np.array(dbscan_weight)
+        self.niter = 100
+        self.coef_rt1 = coef_rt1
+        self.coef_rt2 = coef_rt2
         
-    def predict(self, dfh, w1, w2, w3, niter):
-        niter = int(niter)
+    def predict(self, dfh):
+        niter = self.niter
         dfh["s1"] = dfh.hit_id
         dfh["N1"] = 1
-        dfh['r'] = np.sqrt(dfh['x'].values**2+dfh['y'].values**2+dfh['z'].values**2)
-        dfh['rt']= np.sqrt(dfh['x'].values**2+dfh['y'].values**2)
+        dfh['r']  = np.sqrt(dfh['x'].values**2+dfh['y'].values**2+dfh['z'].values**2)
+        dfh['rt'] = np.sqrt(dfh['x'].values**2+dfh['y'].values**2)
         dfh['a0'] = np.arctan2(dfh['y'].values,dfh['x'].values)
         dfh['z1'] = dfh['z'].values/dfh['rt'].values
         dfh['z2'] = dfh['z'].values/dfh['r'].values
 
         mm = 1
-        for ii in range(niter):
+        for ii in tqdm(range(niter)):
             # unroll helices
             mm = mm*(-1)
-            dfh["a1"] = dfh.a0 + mm*(dfh.rt.values + 0.000005*dfh.rt.values**2) / 1000.0 * (ii/2)/180.0*np.pi
+            dfh["a1"] = dfh.a0 + mm*(self.coef_rt1 * dfh.rt.values +
+                                     self.coef_rt2 * 0.000005 * dfh.rt.values**2) / 1000.0 * (ii/2)/180.0*np.pi
             dfh["sina1"] = np.sin(dfh["a1"].values)
             dfh["cosa1"] = np.cos(dfh["a1"].values)
+            
+            dfh['x_y'] = dfh['x'].values/dfh['y'].values
+            dfh['x_rt'] = dfh['x'].values/dfh['rt'].values
+            dfh['y_rt'] = dfh['y'].values/dfh['rt'].values
 
             # scaling
             ss = StandardScaler()
-            dfs = ss.fit_transform(dfh[["sina1", "cosa1", "z1", "z2"]])
-            self.cx = np.array([w1, w1, w2, w3])
-            dfs[:,:] = dfs[:,:] * self.cx[np.newaxis,:]
+            dfs = ss.fit_transform(dfh[self.dbscan_features].values)
+            dfs[:,:] = dfs[:,:] * self.dbscan_weight[np.newaxis,:]
 
             # clustering
             res=DBSCAN(eps=0.0035,min_samples=1,metric='euclidean',n_jobs=4).fit(dfs).labels_
@@ -238,8 +259,5 @@ class UnrollingHelicesBayessianOpt(object):
             dfh['N1'] = dfh.groupby('s1')['s1'].transform('count')
 
         return dfh["s1"]
-    
-    
-
 
     
