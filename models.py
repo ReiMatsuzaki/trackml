@@ -208,7 +208,9 @@ class UnrollingHelicesRt2(object):
                  niter = 100,
                  coef_rt1 = 1.0,
                  coef_rt2 = 1.0,
-                 coef_a1 = 1000.0):
+                 coef_a1 = 1000.0,
+                 eps0 = 0.0035,
+                 step_eps = 0.0):
 
         if(len(dbscan_features) != len(dbscan_weight)):
             raise InputError("len(dbscan_features) != len(dbscan_weight)")
@@ -218,6 +220,8 @@ class UnrollingHelicesRt2(object):
         self.niter = 100
         self.coef_rt1 = coef_rt1
         self.coef_rt2 = coef_rt2
+        self.eps0 = eps0
+        self.step_eps = step_eps # 0.000005 is used in mod-dbscan x 100
         
     def predict(self, dfh):
         niter = self.niter
@@ -248,7 +252,7 @@ class UnrollingHelicesRt2(object):
             dfs[:,:] = dfs[:,:] * self.dbscan_weight[np.newaxis,:]
 
             # clustering
-            res=DBSCAN(eps=0.0035,min_samples=1,metric='euclidean',n_jobs=4).fit(dfs).labels_
+            res=DBSCAN(eps=self.eps0+ii*self.step_eps,min_samples=1,metric='euclidean',n_jobs=4).fit(dfs).labels_
             dfh["s2"] = res
             dfh['N2'] = dfh.groupby('s2')['s2'].transform('count')
             maxs1 = np.max(dfh.s1)

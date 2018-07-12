@@ -1,4 +1,4 @@
-# copied from 06.py
+# copied from 08.py and 09.py
 
 import sys
 import os
@@ -37,7 +37,7 @@ def run(filename):
         hits_list.append(hits)
         truth_list.append(truth)
 
-    def Fun4BO(w_a1, w_z1, w_z2, w_xy_rt, c_rt1, c_rt2):
+    def Fun4BO(w_a1, w_z1, w_z2, w_xy_rt, c_rt1, c_rt2, eps0, step_eps):
         model.dbscan_weight[0] = w_a1
         model.dbscan_weight[1] = w_a1
         model.dbscan_weight[2] = w_z1
@@ -46,6 +46,8 @@ def run(filename):
         model.dbscan_weight[5] = w_xy_rt
         model.coef_rt1 = c_rt1
         model.coef_rt2 = c_rt2
+        model.eps0 = eps0
+        model.step_eps = step_eps
         score_list = []
         for (hits, truth) in zip(hits_list, truth_list):
             labels = model.predict(hits)
@@ -61,7 +63,9 @@ def run(filename):
                                 "w_z2"    : (0.1, 0.4),
                                 "w_xy_rt" : (0.01, 0.2),
                                 "c_rt1"   : (0.5, 1.5),
-                                "c_rt2"   : (0.1, 5.0)
+                                "c_rt2"   : (0.1, 5.0),
+                                "eps0"    : (0.003, 0.004),
+                                "step_eps": (0.0,   0.00001)
                                },
                                verbose = True)
     opt.maximize(init_points = 3,

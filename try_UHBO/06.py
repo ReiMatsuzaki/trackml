@@ -69,7 +69,7 @@ def run(filename):
                 val.append(params[i][label])
                 data_dic[label] = val
         data_dic["value"] = [opt.res["max"]["max_val"]] + opt.res["all"]["values"]
-        data_dic["index"] = ["max"] + [str(x) for x in range(len_params)]
+        data_dic["label"] = ["max"] + [str(x) for x in range(len_params)]
         df = pd.DataFrame(data_dic)
         df.to_csv(filename, index=None)
 

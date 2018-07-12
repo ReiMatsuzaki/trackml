@@ -1,3 +1,5 @@
+# cpoied from 06.py
+
 import sys
 import os
 join = os.path.join
@@ -18,17 +20,25 @@ import models
 from utils import create_one_event_submission
 
 def run(filename):
-    model = models.UnrollingHelicesRt2()    
+    model = models.UnrollingHelicesRt2(
+        dbscan_features=["sina1", "cosa1", "z1", "z2", "x_rt", "y_rt"],
+        dbscan_weight  =[1.0,     1.0,     0.75, 0.2,  0.05,   0.05])
+    model.niter = 150
     path_to_input = os.path.join(path_to_trackml, "train_1")
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],
                                               skip=0, nevents=1):
 
-        def Fun4BO(w1, w2, w3, niter):
-            model.dbscan_weight[0] = w1
-            model.dbscan_weight[1] = w1
-            model.dbscan_weight[2] = w2
-            model.dbscan_weight[3] = w3
-            model.niter = int(niter)
+        def Fun4BO(w_a1, w_z1, w_z2, w_xy_rt, c_rt1, c_rt2, eps0, step_eps):
+            model.dbscan_weight[0] = w_a1
+            model.dbscan_weight[1] = w_a1
+            model.dbscan_weight[2] = w_z1
+            model.dbscan_weight[3] = w_z2
+            model.dbscan_weight[4] = w_xy_rt
+            model.dbscan_weight[5] = w_xy_rt
+            model.coef_rt1 = c_rt1
+            model.coef_rt2 = c_rt2
+            model.eps0 = eps0
+            model.step_eps = step_eps
             labels = model.predict(hits)
             one_submission = create_one_event_submission(event_id, hits, labels)
             score = score_event(truth, one_submission)
@@ -36,13 +46,18 @@ def run(filename):
 
         print("Bayesian Optimization")
         opt = BayesianOptimization(Fun4BO,
-                                   {"w1": (0.9, 1.2),
-                                    "w2": (0.3, 0.7),
-                                    "w3": (0.1, 0.4),
-                                    "niter": (140, 190)},  #(140, 190)
-                                   verbose = True)
+                                   {"w_a1"    : (0.9, 1.2),
+                                    "w_z1"    : (0.3, 0.7),
+                                    "w_z2"    : (0.1, 0.4),
+                                    "w_xy_rt" : (0.01, 0.2),
+                                    "c_rt1"   : (0.5, 1.5),
+                                    "c_rt2"   : (0.1, 5.0),
+                                    "eps0"    : (0.003, 0.004),
+                                    "step_eps": (0.0, 0.00001),
+                                    },
+                                    verbose = True)
         opt.maximize(init_points = 3,
-                     n_iter = 100, #
+                     n_iter = 40, #
                      acq = "ucb",
                      kappa = 2.576)
 

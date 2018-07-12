@@ -25,13 +25,13 @@ def run(filename):
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],
                                               skip=0, nevents=1):
 
-        def Fun4BO(w1, w2, w3, c1, c2, niter):
-            model.dbscan_weight[0] = w1
-            model.dbscan_weight[1] = w1
-            model.dbscan_weight[2] = w2
-            model.dbscan_weight[3] = w3
-            model.coef_rt1 = c1
-            model.coef_rt2 = c2
+        def Fun4BO(w_a1, w_z1, w_z2, c_rt1, c_rt2, niter):
+            model.dbscan_weight[0] = w_a1
+            model.dbscan_weight[1] = w_a1
+            model.dbscan_weight[2] = w_z1
+            model.dbscan_weight[3] = w_z2
+            model.coef_rt1 = c_rt1
+            model.coef_rt2 = c_rt2
             model.niter = int(niter)
             labels = model.predict(hits)
             one_submission = create_one_event_submission(event_id, hits, labels)
@@ -40,11 +40,11 @@ def run(filename):
 
         print("Bayesian Optimization")
         opt = BayesianOptimization(Fun4BO,
-                                   {"w1": (0.9, 1.2),
-                                    "w2": (0.3, 0.7),
-                                    "w3": (0.1, 0.4),
-                                    "c1": (0.5, 1.5),
-                                    "c2": (0.1, 5.0),
+                                   {"w_a1": (0.9, 1.2),
+                                    "w_z1": (0.3, 0.7),
+                                    "w_z2": (0.1, 0.4),
+                                    "c_rt1": (0.5, 1.5),
+                                    "c_rt2": (0.1, 5.0),
                                     "niter": (140, 190)},  #(140, 190)
                                    verbose = True)
         opt.maximize(init_points = 3,
@@ -66,9 +66,9 @@ def run(filename):
                 val.append(params[i][label])
                 data_dic[label] = val
         data_dic["value"] = [opt.res["max"]["max_val"]] + opt.res["all"]["values"]
-        data_dic["index"] = ["max"] + [str(x) for x in range(len_params)]
+        data_dic["label"] = ["max"] + [str(x) for x in range(len_params)]
         df = pd.DataFrame(data_dic)
-        df.to_csv(filename, index=None)
+        df.to_csv(filename, label=None)
 
 if __name__=="__main__":
     run(sys.argv[0].split(".")[0]+".log")

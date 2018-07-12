@@ -26,7 +26,7 @@ def run(filename):
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],
                                               skip=0, nevents=1):
 
-        def Fun4BO(w_a1, w_z1, w_z2, w_xy, w_xy_rt, c_r1, c_r2, niter):
+        def Fun4BO(w_a1, w_z1, w_z2, w_xy, w_xy_rt, c_r1, c_r2):
             model.dbscan_weight[0] = w_a1
             model.dbscan_weight[1] = w_a1
             model.dbscan_weight[2] = w_z1
@@ -36,7 +36,6 @@ def run(filename):
             model.dbscan_weight[6] = w_xy_rt
             model.coef_rt1  = c_r1
             model.coef_rt2  = c_r2
-            model.niter = int(niter)
             labels = model.predict(hits)
             one_submission = create_one_event_submission(event_id, hits, labels)
             score = score_event(truth, one_submission)
@@ -50,12 +49,11 @@ def run(filename):
                                     "w_xy"    : (0.01, 0.2),
                                     "w_xy_rt" : (0.01, 0.2),
                                     "c_r1"    : (0.5, 1.5),
-                                    "c_r2"    : (0.1, 5.0),
-                                    "niter": (140, 190)
+                                    "c_r2"    : (0.1, 5.0)
                                    },
                                    verbose = True)
         opt.maximize(init_points = 3,
-                     n_iter = 100, #
+                     n_iter = 40, #
                      acq = "ucb",
                      kappa = 2.576)
 
@@ -73,9 +71,9 @@ def run(filename):
                 val.append(params[i][label])
                 data_dic[label] = val
         data_dic["value"] = [opt.res["max"]["max_val"]] + opt.res["all"]["values"]
-        data_dic["index"] = ["max"] + [str(x) for x in range(len_params)]
+        data_dic["label"] = ["max"] + [str(x) for x in range(len_params)]
         df = pd.DataFrame(data_dic)
-        df.to_csv(filename, index=None)
+        df.to_csv(filename, label=None)
 
 if __name__=="__main__":
     run(sys.argv[0].split(".")[0]+".log")

@@ -25,15 +25,15 @@ def run(filename):
     for event_id, hits, truth in load_dataset(path_to_input, parts=["hits", "truth"],
                                               skip=0, nevents=1):
 
-        def Fun4BO(w1, w2, w3, w4, w5, w6, niter):
-            model.dbscan_weight[0] = w1
-            model.dbscan_weight[1] = w1
-            model.dbscan_weight[2] = w2
-            model.dbscan_weight[3] = w3
-            model.dbscan_weight[4] = w4
-            model.dbscan_weight[5] = w5
-            model.dbscan_weight[6] = w6
-            model.dbscan_weight[7] = w6
+        def Fun4BO(w_a1, w_z1 w_x1, w_x2, w_x_y, w_xy_rt, niter):
+            model.dbscan_weight[0] = w_a1
+            model.dbscan_weight[1] = w_a1
+            model.dbscan_weight[2] = w_z1
+            model.dbscan_weight[3] = w_x1
+            model.dbscan_weight[4] = w_x2
+            model.dbscan_weight[5] = w_x_y
+            model.dbscan_weight[6] = w_xy_rt
+            model.dbscan_weight[7] = w_xy_rt
             model.iter_size_helix = int(niter)
             labels = model.predict(hits)
             one_submission = create_one_event_submission(event_id, hits, labels)
@@ -69,9 +69,9 @@ def run(filename):
                 val.append(params[i][label])
                 data_dic[label] = val
         data_dic["value"] = [opt.res["max"]["max_val"]] + opt.res["all"]["values"]
-        data_dic["index"] = ["max"] + [str(x) for x in range(len_params)]
+        data_dic["label"] = ["max"] + [str(x) for x in range(len_params)]
         df = pd.DataFrame(data_dic)
-        df.to_csv(filename, index=None)
+        df.to_csv(filename, label=None)
 
 if __name__=="__main__":
     run(sys.argv[0].split(".")[0]+".log")
