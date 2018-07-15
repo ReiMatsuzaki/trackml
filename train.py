@@ -26,7 +26,7 @@ def run(model, test_or_train, path_to_out, nevents=None):
         sys.strerr.write("Error")
         sys.exit()
 
-        path_to_input = os.path.join(path_to_trackml, test_or_train)
+    path_to_input = os.path.join(path_to_trackml, test_or_train)
 
     os.makedirs(path_to_out, exist_ok=True)
     print("calculation begin : {0}".format(datetime.datetime.today()))

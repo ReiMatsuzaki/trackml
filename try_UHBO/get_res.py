@@ -6,7 +6,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-log_filenames = ["{0:02}.log".format(i) for i in [2,3,4,5,6]]
+log_filenames = ["{0:02}.log".format(i) for i in [2,3,4,5,6,7,8,10,11]]
 
 
 for log_filename in log_filenames:    

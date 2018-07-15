@@ -43,7 +43,7 @@ def run(filename):
         dataset_submission.append(one_submission)
         
     submission = pd.concat(dataset_submission)
-    submission.to_csv(filename)
+    submission.to_csv(filename, index=None)
 
 if __name__=="__main__":
     run(sys.argv[0].split(".")[0]+"_submission.csv")

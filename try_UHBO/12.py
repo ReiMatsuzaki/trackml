@@ -24,7 +24,7 @@ def run(filename):
         dbscan_features=["sina1", "cosa1", "z1", "z2", "x_rt", "y_rt"],
         dbscan_weight  =[1.0,     1.0,     0.75, 0.2,  0.05,   0.05])
     model.niter = 150
-    nevents = 10
+    nevents = 1
     niter_bo = 40
     path_to_input = os.path.join(path_to_trackml, "train_1")
 
@@ -37,13 +37,14 @@ def run(filename):
         hits_list.append(hits)
         truth_list.append(truth)
 
-    def Fun4BO(w_a1, w_z1, w_z2, w_xy_rt):
+    def Fun4BO(w_a1, w_z1, w_z2, w_xy_rt, eps0):
         model.dbscan_weight[0] = w_a1
         model.dbscan_weight[1] = w_a1
         model.dbscan_weight[2] = w_z1
         model.dbscan_weight[3] = w_z2
         model.dbscan_weight[4] = w_xy_rt
         model.dbscan_weight[5] = w_xy_rt
+        model.eps0 = eps0
         score_list = []
         for (hits, truth) in zip(hits_list, truth_list):
             labels = model.predict(hits)
@@ -57,7 +58,8 @@ def run(filename):
                                {"w_a1"    : (0.7, 1.2),
                                 "w_z1"    : (0.3, 0.7),
                                 "w_z2"    : (0.1, 0.4),
-                                "w_xy_rt" : (0.002, 0.2)
+                                "w_xy_rt" : (0.002, 0.2),
+                                "eps0"    : (0.001, 0.01)
                                },
                                verbose = True)
     opt.maximize(init_points = 3,

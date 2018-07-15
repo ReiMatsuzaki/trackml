@@ -57,7 +57,7 @@ def run(filename):
                                     },
                                     verbose = True)
         opt.maximize(init_points = 3,
-                     n_iter = 40, #
+                     n_iter = 40, # 25
                      acq = "ucb",
                      kappa = 2.576)
 
@@ -77,7 +77,7 @@ def run(filename):
         data_dic["value"] = [opt.res["max"]["max_val"]] + opt.res["all"]["values"]
         data_dic["label"] = ["max"] + [str(x) for x in range(len_params)]
         df = pd.DataFrame(data_dic)
-        df.to_csv(filename, label=None)
+        df.to_csv(filename, index=None)
 
 if __name__=="__main__":
     run(sys.argv[0].split(".")[0]+".log")

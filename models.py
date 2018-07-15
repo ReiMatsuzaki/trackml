@@ -4,7 +4,9 @@ import hdbscan
 from scipy import stats
 from tqdm import tqdm
 from sklearn.cluster import DBSCAN
+from sklearn.cluster.dbscan_ import dbscan
 from sklearn.linear_model import LinearRegression
+from itertools import product
 
 class UnrollingHelices(object):
     def __init__(self,rz_scales=[0.65, 0.965, 1.528], use_outlier=True, iter_size_helix=100,
@@ -265,3 +267,91 @@ class UnrollingHelicesRt2(object):
         return dfh["s1"]
 
     
+
+class ZAScale(object):
+    EPS = 1e-12
+    def __init__(self,
+                 djs=[-20, 0, 20],
+                 dis=[-0.003, 0.0, 0.003]):
+        self.djs = djs
+        self.dis = dis
+    
+    def predict(self, dfh):
+        
+        dfh["s1"] = dfh.hit_id
+        dfh["N1"] = 1
+        dfh["rt"] = np.sqrt(dfh['x'].values**2+dfh['y'].values**2)
+        
+        z  = dfh['z'].values
+        rt = dfh["rt"].values
+        a0 = np.arctan2(dfh['y'].values,dfh['x'].values)
+        layer_id = dfh['layer_id'].values.astype(np.float32)
+
+        # subset
+        dfh = dfh.loc[dfh.z>500]
+        dfh = dfh.loc[(dfh.rt>50) & (dfh.rt<100)]
+
+        
+        dj = 0
+        di = 0        
+
+        print("dbscan for each (z,a) shifting")
+        # djs = np.arange(-20, 20+EPS, 10)
+        # dis = np.arange(-0.003, 0.003+EPS, 0.00025)
+        scan_labels = []
+        for (dj, di) in tqdm(product(self.djs, self.dis), total=len(self.djs)*len(self.dis)):
+            ar = a0 + di*rt
+            zr = (z+dj)/rt * 0.1
+            data2 = np.column_stack([ar, zr])
+            
+            _,scan_label = dbscan(data2, eps=0.0025, min_samples=1,)
+            scan_labels.append(scan_label)
+
+        N = len(dfh)
+
+        print("calc candidate")
+        candidates = []
+        for scan_label in tqdm(scan_labels):
+            l = scan_label
+            track_ids = np.unique(l)
+            track_ids = track_ids[track_ids!=0]
+            neighbour = [np.where(l==t)[0] for t in track_ids]
+            
+            unique, inverse, c = np.unique(l, return_counts=True, return_inverse=True)
+            unique = unique[unique!=0]
+            c = c[inverse]
+            c[l==0] = 0
+            
+            for u in unique:
+                candidate = np.where(l==u)[0]
+                candidates.append(candidate)
+
+        print("# of candidates : {0}".format(len(candidates)))
+        
+        count = np.array([len(candidate) for candidate in candidates])
+        sort = np.argsort(-count)
+        candidates = [candidates[s] for s in sort]
+
+        max_label = 1
+        label = np.zeros(N,np.int32)
+        count = np.zeros(N,np.int32)
+
+        print("calculate clustering from candidates")
+        for candidate in tqdm(candidates):
+            n = candidate
+            L = len(n)
+
+            n = n[np.argsort(np.fabs(z[n]))]
+            layer_id0 = layer_id[n[:-1]]
+            layer_id1 = layer_id[n[1: ]]
+            ld = layer_id1-layer_id0
+            if np.any(ld>2): continue
+
+            m = count[n].max()
+            if L<m: continue
+
+            count[n] = L
+            label[n] = max_label
+            max_label += 1
+                        
+        return label
