@@ -23,7 +23,8 @@ def run_candidate():
     print("script begin", datetime.datetime.now())
     EPS = 1e-12
     model = models.ZAScale(djs=np.arange(-20, 20+EPS, 10),
-                           dis=np.arange(-0.003, 0.003+EPS, 0.00025))
+                           dis=np.arange(-0.003, 0.003+EPS, 0.00025),
+                           min_ncand=1)
     nevents = 1
     path_to_input = os.path.join(path_to_trackml, "train_1")
     path_to_out   = "out_{0}".format(sys.argv[0].split(".")[0])
@@ -44,8 +45,12 @@ def run_candidate():
     sys.stderr.write("scan\n")
     for (event_id, hits, truth) in zip(event_id_list, hits_list, truth_list):
 
-        truth = truth.merge(hits,       on=['hit_id'],      how='left')
+        truth = truth.merge(hits, on=['hit_id'], how='left')
         dfh = truth.copy()
+        dfh["rt"] = np.sqrt(dfh['x'].values**2+dfh['y'].values**2)
+        dfh = dfh.loc[dfh.z>500]
+        dfh = dfh.loc[(dfh.rt>50) & (dfh.rt<100)]
+
         label = model.predict(dfh)
 
         submission = pd.DataFrame(columns=['event_id', 'hit_id', 'track_id'],

@@ -1,0 +1,9 @@
+script begin 2018-07-15 18:07:32.253254
+size(hits) :  120939
+size(dfh): 6758
+dbscan for each (z,a) shifting
+calc candidate
+# of candidates : 559230
+calculate clustering from candidates
+score: 0.05146  (0.91176)
+script end 2018-07-15 18:08:06.290044

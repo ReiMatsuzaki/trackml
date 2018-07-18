@@ -4,3 +4,5 @@ try_UHf/
 .ipynb_checkpoints/
 __pycache__/
 *.pyc
+*.csv
+*.ipynb

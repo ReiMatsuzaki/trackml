@@ -22,13 +22,18 @@ import models
 def run_candidate():
     print("script begin", datetime.datetime.now())
     EPS = 1e-12
-    model = models.ZAScale(djs=np.arange(-20, 20+EPS, 10),
-                           dis=np.arange(-0.003, 0.003+EPS, 0.00025))
+    model = models.UnrollingHelicesShiftingZ(
+        dbscan_features = ["sina1", "cosa1", "z1", "z2", "x_y", "x_r", "y_r", "rt_r"],
+        dbscan_weight   = [2.7474448671796874, 2.7474448671796874,
+                           1.3649721713529086, 0.7034918842926337,
+                           0.0005549122352940002, 0.023096034747190672,0.04619756315527515,0.2437077420144654],
+        djs = [-20, -10, 0, 10, 20],
+        niter = 150,
+        eps0 = 0.00975)
+
     nevents = 1
     path_to_input = os.path.join(path_to_trackml, "train_1")
     path_to_out   = "out_{0}".format(sys.argv[0].split(".")[0])
-
-    os.makedirs(path_to_out, exist_ok=True)
 
     event_id_list = []
     hits_list = []
@@ -49,8 +54,10 @@ def run_candidate():
         label = model.predict(dfh)
 
         submission = pd.DataFrame(columns=['event_id', 'hit_id', 'track_id'],
-                                  data=np.column_stack(([int(event_id),]*len(dfh), dfh.hit_id.values, label))
-        ).astype(int)
+                                  data=np.column_stack(([int(event_id),]*len(dfh),
+                                                        dfh.hit_id.values,
+                                                        label))).astype(int)
+        submission.to_csv("05.csv", index=None)
         score = score_event(dfh, submission)
         max_score = dfh.weight.sum()        
         print("score: %0.5f  (%0.5f)" % (score*max_score, score))

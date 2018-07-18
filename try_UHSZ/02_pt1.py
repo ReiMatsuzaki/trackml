@@ -22,13 +22,17 @@ import models
 def run_candidate():
     print("script begin", datetime.datetime.now())
     EPS = 1e-12
-    model = models.ZAScale(djs=np.arange(-20, 20+EPS, 10),
-                           dis=np.arange(-0.003, 0.003+EPS, 0.00025))
+    model = models.UnrollingHelicesShiftingZ(
+        djs=[-20, -10, 0, 10, 20],
+        dbscan_features= ["sina1", "cosa1", "z1", "z2", "x_rt", "y_rt"],
+        dbscan_weight  = [0.9,     0.9,     0.35, 0.22, 0.01,   0.01  ],
+        coef_rt1 = 1.33,
+        coef_rt2 = 0.0,
+        niter = 150)
+                                             
     nevents = 1
     path_to_input = os.path.join(path_to_trackml, "train_1")
     path_to_out   = "out_{0}".format(sys.argv[0].split(".")[0])
-
-    os.makedirs(path_to_out, exist_ok=True)
 
     event_id_list = []
     hits_list = []
@@ -49,8 +53,10 @@ def run_candidate():
         label = model.predict(dfh)
 
         submission = pd.DataFrame(columns=['event_id', 'hit_id', 'track_id'],
-                                  data=np.column_stack(([int(event_id),]*len(dfh), dfh.hit_id.values, label))
-        ).astype(int)
+                                  data=np.column_stack(([int(event_id),]*len(dfh),
+                                                        dfh.hit_id.values,
+                                                        label))).astype(int)
+        submission.to_csv("02.csv", index=None)
         score = score_event(dfh, submission)
         max_score = dfh.weight.sum()        
         print("score: %0.5f  (%0.5f)" % (score*max_score, score))

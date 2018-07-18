@@ -1,0 +1,32 @@
+2018-07-18 19:55:17.946326 05_extend_e4_q.py  begin
+2018-07-18 19:55:18.433208 extend begin
+2018-07-18 19:56:55.465715 extend end
+step1, score: 0.51543
+2018-07-18 19:56:57.353237 extend begin
+2018-07-18 19:58:06.869692 extend end
+step2, score: 0.52100
+2018-07-18 19:58:08.662732 extend begin
+2018-07-18 19:59:13.837639 extend end
+step3, score: 0.52176
+2018-07-18 19:59:15.658064 extend begin
+2018-07-18 20:00:16.627308 extend end
+step4, score: 0.52110
+2018-07-18 20:00:18.197648 RemoveOutliersByQuadric begin
+len(hits) :  120939
+len(clusters) :  120939
+2018-07-18 20:00:18.197791 evaluate score
+score_by_quadric begin
+len(dfh) :  120939
+len(labels) :  5807
+scoring for each cluster
+score_by_quadric end
+max[score] :  -0.0
+scores[:10] [-1.00000000e+00 -7.58941565e-19 -1.00000000e+00 -1.00000000e+00
+ -4.11996858e-18 -4.77048976e-18 -8.45677689e-18 -1.00000000e+00
+ -6.24500395e-17 -2.42861273e-17]
+2018-07-18 20:00:45.404783 HDSCAN
+threashfold :  -1e-05
+# of outliers :  59253
+2018-07-18 20:00:54.801678 RemoveOutliersByQuadric end
+step5, score: 0.52217
+2018-07-18 20:00:55.474318 05_extend_e4_q.py  end

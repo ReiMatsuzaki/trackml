@@ -1,0 +1,20 @@
+2018-07-18 19:26:26.679169 01_extend_th6.py  begin
+2018-07-18 19:26:27.148505 RemoveOutliersByQuadric begin
+len(hits) :  120939
+len(clusters) :  120939
+2018-07-18 19:26:27.148826 evaluate score
+score_by_quadric begin
+len(dfh) :  120939
+len(labels) :  5201
+scoring for each cluster
+score_by_quadric end
+max[score] :  -0.0
+scores[:10] [-1.00000000e+00 -7.58941565e-19 -1.00000000e+00 -1.00000000e+00
+ -4.11996858e-18 -8.02309657e-18 -2.03830028e-17 -1.00000000e+00
+ -6.24500395e-17 -2.42861273e-17]
+2018-07-18 19:26:51.465404 HDSCAN
+threashfold :  -1e-06
+# of outliers :  66705
+2018-07-18 19:26:59.916238 RemoveOutliersByQuadric end
+step1, score: 0.47540
+2018-07-18 19:27:00.581241 01_extend_th6.py  end

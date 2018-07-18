@@ -46,6 +46,10 @@ def run_candidate():
 
         truth = truth.merge(hits,       on=['hit_id'],      how='left')
         dfh = truth.copy()
+        dfh["rt"] = np.sqrt(dfh['x'].values**2+dfh['y'].values**2)
+        dfh = dfh.loc[dfh.z>500]
+        dfh = dfh.loc[(dfh.rt>50) & (dfh.rt<100)]
+        
         label = model.predict(dfh)
 
         submission = pd.DataFrame(columns=['event_id', 'hit_id', 'track_id'],

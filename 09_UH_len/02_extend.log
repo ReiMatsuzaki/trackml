@@ -1,0 +1,17 @@
+2018-07-18 19:52:17.502712 02_extend.py  begin
+2018-07-18 19:52:17.974314 RemoveOutliers begin
+2018-07-18 19:52:18.002737 eliminate_outliers
+2018-07-18 19:52:34.848832 HDSCAN
+# of outliner :  61821
+2018-07-18 19:52:44.815662 RemoveOutliers end
+step1, score: 0.47872
+2018-07-18 19:52:45.491531 extend begin
+2018-07-18 19:53:44.119793 extend end
+step2, score: 0.51291
+2018-07-18 19:53:44.784375 extend begin
+2018-07-18 19:54:24.349643 extend end
+step3, score: 0.51400
+2018-07-18 19:54:25.062443 extend begin
+2018-07-18 19:55:01.138608 extend end
+step4, score: 0.51419
+2018-07-18 19:55:01.837316 02_extend.py  end

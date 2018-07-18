@@ -1,0 +1,20 @@
+2018-07-18 20:02:15.237356 06_extend_e4_q.py  begin
+2018-07-18 20:02:15.718564 extend begin
+2018-07-18 20:03:50.725059 extend end
+step1, score: 0.51543
+2018-07-18 20:03:52.337237 extend begin
+2018-07-18 20:05:00.475468 extend end
+step2, score: 0.52100
+2018-07-18 20:05:02.036783 extend begin
+2018-07-18 20:06:05.217624 extend end
+step3, score: 0.52176
+2018-07-18 20:06:06.787493 extend begin
+2018-07-18 20:07:07.981013 extend end
+step4, score: 0.52110
+2018-07-18 20:07:09.537668 RemoveOutliers begin
+2018-07-18 20:07:09.563881 eliminate_outliers
+2018-07-18 20:07:25.725512 HDSCAN
+# of outliner :  54495
+2018-07-18 20:07:33.535052 RemoveOutliers end
+step5, score: 0.52490
+2018-07-18 20:07:34.209536 06_extend_e4_q.py  end
