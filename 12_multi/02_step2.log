@@ -1,0 +1,10 @@
+2018-07-18 22:41:32.286708 02_step2.py  begin
+len(hits):  120939
+read submission file from step1.submission.csv
+calculate track score
+len(hits1) :  84429
+# of outlier:  84429
+# of good:  34772
+make candidates
+merge
+2018-07-18 22:46:08.415545 02_step2.py  end

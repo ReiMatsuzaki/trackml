@@ -1,0 +1,11 @@
+2018-07-18 21:42:04.980980 00_step1.py  begin
+len(hits):  120939
+read submission file from ../09_UH_len/01_merge.submission.csv
+submission0 score = 0.47281290278785165
+calculate track score
+# of outlier:  104863
+# of good:  16076
+make candidates
+merge
+submission1, score = 0.3249212735557109
+2018-07-18 21:47:44.980564 00_step1.py  end

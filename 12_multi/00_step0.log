@@ -1,0 +1,5 @@
+2018-07-18 22:28:26.769045 00_step0.py  begin
+len(hits):  120939
+make candidates
+merge
+save subimission as step0.submission.csv

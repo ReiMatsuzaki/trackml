@@ -43,18 +43,17 @@ def score_by_quadric(submission, dfh, rz_scales=[0.65, 0.965, 1.528],
 
     clusters = submission["track_id"].values
     labels = df[(nmin < df.N) & (df.N < nmax)]["track_id"].unique()
-
-    if "x_r" not in dfh.columns:
-        x = dfh.x.values
-        y = dfh.y.values
-        z = dfh.z.values
     
-        r = np.sqrt(x**2 + y**2 + z**2)
-        dfh['x_r'] = x/r
-        dfh['y_r'] = y/r
-        
-        r = np.sqrt(x**2 + y**2)
-        dfh['z_rt'] = z/r
+    x = dfh.x.values
+    y = dfh.y.values
+    z = dfh.z.values
+    
+    r = np.sqrt(x**2 + y**2 + z**2)
+    dfh['x_r'] = x/r
+    dfh['y_r'] = y/r
+    
+    r = np.sqrt(x**2 + y**2)
+    dfh['z_rt'] = z/r
     
     ss = StandardScaler()
     X = ss.fit_transform(dfh[['x_r', 'y_r', 'z_rt']].values)

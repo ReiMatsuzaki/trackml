@@ -1,0 +1,46 @@
+2018-07-19 15:06:54.614249 16_epslin0001to0006_004.py  begin
+eps list:  [0.001, 0.002666666666666667, 0.004333333333333333, 0.006, 0.04]
+th_len list:  [13, 10, 6, 3, 3]
+num ext list:  [0, 0, 0, 0, 0]
+len(hits):  120939
+2018-07-19 15:06:55.035431 step1 make_candidates
+2018-07-19 15:13:05.289510 step1 merge
+2018-07-19 15:13:20.483889 step1 extend 0 times
+2018-07-19 15:13:20.483942 step1 compute outlier
+# of outlier:  119201
+# of good:  1738
+step 1, total_score:0.14203335034294254
+step 1, good_score: 0.994870545772498
+2018-07-19 15:13:25.136834 step2 make_candidates
+2018-07-19 15:19:32.443865 step2 merge
+2018-07-19 15:19:46.050922 step2 extend 0 times
+2018-07-19 15:19:46.050969 step2 compute outlier
+# of outlier:  95621
+# of good:  23580
+step 2, total_score:0.4108342766059515
+step 2, good_score: 0.9489573217787136
+2018-07-19 15:19:49.692269 step3 make_candidates
+2018-07-19 15:24:49.500045 step3 merge
+2018-07-19 15:25:00.890278 step3 extend 0 times
+2018-07-19 15:25:00.890333 step3 compute outlier
+# of outlier:  57294
+# of good:  38327
+step 3, total_score:0.4826939817779319
+step 3, good_score: 0.7248574273946577
+2018-07-19 15:25:04.066639 step4 make_candidates
+2018-07-19 15:27:58.300606 step4 merge
+2018-07-19 15:28:05.298095 step4 extend 0 times
+2018-07-19 15:28:05.298132 step4 compute outlier
+# of outlier:  24409
+# of good:  32885
+step 4, total_score:0.4938896661306473
+step 4, good_score: 0.19807396036426375
+2018-07-19 15:28:08.116435 step5 make_candidates
+2018-07-19 15:29:27.168760 step5 merge
+2018-07-19 15:29:29.956022 step5 extend 0 times
+2018-07-19 15:29:29.956054 step5 compute outlier
+# of outlier:  1901
+# of good:  22508
+step 5, total_score:0.4968526947327411
+step 5, good_score: 0.04869506418002506
+2018-07-19 15:29:31.251397 16_epslin0001to0006_004.py  end

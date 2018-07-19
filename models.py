@@ -8,6 +8,16 @@ from sklearn.cluster import DBSCAN
 from sklearn.cluster.dbscan_ import dbscan
 from sklearn.linear_model import LinearRegression
 from itertools import product
+from sklearn.base import BaseEstimator, ClusterMixin    
+from extension import extend
+from utils import create_one_event_submission
+import score_track
+
+path_to_trackml = os.path.expanduser("~/trackml")
+path_to_trackmllib = os.path.join(path_to_trackml, "trackml-library")
+sys.path.append(path_to_trackmllib)
+from trackml.dataset import load_dataset
+from trackml.score import score_event
 
 class UnrollingHelices(object):
     def __init__(self,rz_scales=[0.65, 0.965, 1.528], use_outlier=True, iter_size_helix=100,
@@ -484,4 +494,115 @@ class UnrollingHelicesShiftingZ(object):
             dfh['N1'] = dfh.groupby('s1')['s1'].transform('count')
 
         return dfh["s1"]
+
+
+class BaseTrackmlModel(BaseEstimator, ClusterMixin):
+    def __init__(self):
+        pass
     
+    def predict(in_dfh, y=None):
+        return self.submission["track_id"].values
+    
+    def fit_predict(in_dfh, y=None):
+        self.fit(in_dfh)
+        return self.predict(in_dfh)
+
+    def score(in_dfh, truth):
+        return score_event(truth, self.submission)
+
+    
+class UnrollingHelicesA1Z1Z2(BaseTrackmlModel):
+    def __init__(self, niter=150, coef_rt=1.0, eps0=0.0035, nextend=0):
+        self.niter = niter
+        self.coef_rt = coef_rt
+        self.eps0 = eps0
+        self.nextend = nextend
+
+    def fit(dfh, y=None):
+        dfh["s1"] = dfh.hit_id
+        dfh["N1"] = 1
+        dfh['r']  = np.sqrt(dfh['x'].values**2+dfh['y'].values**2+dfh['z'].values**2)
+        dfh['rt'] = np.sqrt(dfh['x'].values**2+dfh['y'].values**2)
+        dfh['a0'] = np.arctan2(dfh['y'].values,dfh['x'].values)
+
+        mm = 1
+        for ii in tqdm(range(self.niter), total=self.niter):
+            # unroll helices
+            mm = mm*(-1)
+            dfh['z1'] = (dfh['z'].values+dj)/dfh['rt'].values
+            dfh['z2'] = (dfh['z'].values+dj)/dfh['r'].values
+            dfh["a1"] = dfh.a0 + mm*(self.coef_rt * dfh.rt.values)/1000.0 * (ii/2)/180.0*np.pi
+            
+            dfh["sina1"] = np.sin(dfh["a1"].values)
+            dfh["cosa1"] = np.cos(dfh["a1"].values)
+            
+            # scaling
+            ss = StandardScaler()
+            dfs = ss.fit_transform(dfh[self.dbscan_features].values)
+            dfs[:,:] = dfs[:,:] * self.dbscan_weight[np.newaxis,:]
+
+            # clustering
+            res=DBSCAN(eps=self.eps0,min_samples=1,metric='euclidean',n_jobs=4).fit(dfs).labels_
+            dfh["s2"] = res
+            dfh['N2'] = dfh.groupby('s2')['s2'].transform('count')
+            maxs1 = np.max(dfh.s1)
+            dfh.s1 = np.where((dfh.N2>dfh.N1)&(dfh.N2<20),
+                              dfh.s2 + maxs1,
+                              dfh.s1)
+            dfh['s1'] = dfh['s1'].astype('int64')
+            dfh['N1'] = dfh.groupby('s1')['s1'].transform('count')
+            
+        labels = dfh["s1"]
+        submission = create_one_event_submission(0, dfh, labels)
+        for i in range(self.nextend):
+            submission = extend(submission, dfh)
+            
+        self.submission = submission
+        return self
+
+    def get_params(deep=True):
+        return {"niter": self.niter,
+                "coef_rt": self.coef_rt,
+                "eps0": self.eps0,
+                "nextend": self.nexted}
+
+    def set_params(**params):
+        self.niter = params["niter"]
+        self.coef_rt = params["coef_rt"]
+        self.eps0 = params["eps0"]
+        self.nextend = params["nextend"]
+        
+class MultiStageByLen(BaseEstimator, ClusterMixin):
+    def __init(self, model_list, th_lens):
+        self.model_list = model_list
+        self.th_lens = th_lens
+
+    def fit(in_dfh, y=None):
+        dfh = in_dfh.copy()
+        submission_outlier_list = []
+        submission_good_list = []
+        for istep in range(len(self.model_list)):
+            model = self.model_list[istep]
+            submission = model.fit_predict_for_submission(dfh)
+            tscore = score_track.score_by_length(submission, hits)
+            outlier_mask = tscore < self.th_lens[istep]
+            submission_outlier = submission[outlier_mask]
+            submission_good    = submission[~outlier_mask]
+            print("# of outlier: ", len(submission_outlier))
+            print("# of good: ",    len(submission_good))    
+            dfh = submission_outlier.merge(dfh, on="hit_id")[dfh.columns]
+            submission_outlier_list.append(submission_outlier)
+            submission_good_list.append(submission_good)
+
+        submission = pd.concat( submission_good_list + [submission_outlier_list[-1]])
+        self.submission = in_dfh.merge(submission, on="hit_id")[submission.columns]
+        return self
+
+    def get_params(deep=True):
+        return {"model_list": self.model_list,
+                "th_lens": self.th_lens}
+        
+    def set_params(**params):
+        self.model_list = params["model_list"]
+        self.th_lens = params["th_lens"]
+

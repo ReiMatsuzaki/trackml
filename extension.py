@@ -150,9 +150,10 @@ class RemoveOutliersByQuadric(object):
         print(datetime.datetime.now(), "RemoveOutliersByQuadric end")
         return df
     
-def extend(submission,hits,limit=0.04, num_neighbours=18):
-    
-    print(datetime.datetime.now(), "extend begin")
+def extend(submission,hits,limit=0.04, num_neighbours=18, verbose=False):
+
+    if(verbose):
+        print(datetime.datetime.now(), "extend begin")
     
     df = submission.merge(hits,  on=['hit_id'], how='left')
     df = df.assign(d = np.sqrt( df.x**2 + df.y**2 + df.z**2 ))
@@ -237,7 +238,8 @@ def extend(submission,hits,limit=0.04, num_neighbours=18):
             
     #print ('\r')
     df = df[['event_id', 'hit_id', 'track_id']]
-    print(datetime.datetime.now(), "extend end")
+    if(verbose):
+        print(datetime.datetime.now(), "extend end")
     return df
 
 
